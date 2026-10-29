@@ -42,8 +42,7 @@ export class CardToken {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/examples/cardtoken/create.ts Usage Example }.
 	 */
 	create ({ body, requestOptions }: CardTokenCreateData): Promise<CardTokenResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return create({ body, config: this.config });
+		return create({ body, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -54,7 +53,6 @@ export class CardToken {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/examples/cardtoken/get.ts Usage Example }.
 	 */
 	get({ id, requestOptions }: CardTokenGetData): Promise<CardTokenResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return get({ id, config: this.config });
+		return get({ id, config: this.config.withOptions(requestOptions) });
 	}
 }

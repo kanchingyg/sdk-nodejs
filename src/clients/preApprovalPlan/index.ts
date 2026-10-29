@@ -44,8 +44,7 @@ export class PreApprovalPlan {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preapprovalplan/create.ts Usage Example }.
 	 */
 	create({ body, requestOptions }: PreApprovalPlanCreateData): Promise<PreApprovalPlanResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return create({ body, config: this.config });
+		return create({ body, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -54,8 +53,7 @@ export class PreApprovalPlan {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preapprovalplan/get.ts Usage Example }.
 	 */
 	get({ preApprovalPlanId, requestOptions }: PreApprovalPlanGetData): Promise<PreApprovalPlanResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return get({ id: preApprovalPlanId, config: this.config });
+		return get({ id: preApprovalPlanId, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -64,8 +62,7 @@ export class PreApprovalPlan {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preapprovalplan/update.ts Usage Example }.
 	 */
 	update({ id, updatePreApprovalPlanRequest, requestOptions }: UpdatePreApprovalPlanUpdateData): Promise<PreApprovalPlanResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return update({ id, updatePreApprovalPlanRequest, config: this.config });
+		return update({ id, updatePreApprovalPlanRequest, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -75,8 +72,7 @@ export class PreApprovalPlan {
 	 */
 	search(preApprovalPlanSearchData: PreApprovalPlanSearchData = {}): Promise<PreApprovalPlanSearchResponse> {
 		const { options, requestOptions } = preApprovalPlanSearchData;
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return search({ options, config: this.config });
+		return search({ options, config: this.config.withOptions(requestOptions) });
 	}
 
 }

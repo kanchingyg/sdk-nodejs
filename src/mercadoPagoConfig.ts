@@ -47,4 +47,16 @@ export class MercadoPagoConfig {
 		this.accessToken = config.accessToken;
 		this.options = config.options;
 	}
+
+	/**
+	 * Returns a request-scoped configuration with `requestOptions` merged over
+	 * `this.options`, without mutating the shared {@link MercadoPagoConfig} instance.
+	 */
+	withOptions(requestOptions?: Options): MercadoPagoConfig {
+		if (!requestOptions) return this;
+		return new MercadoPagoConfig({
+			accessToken: this.accessToken,
+			options: { ...this.options, ...requestOptions },
+		});
+	}
 }

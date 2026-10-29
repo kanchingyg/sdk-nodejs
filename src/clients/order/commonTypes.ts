@@ -165,7 +165,7 @@ export declare type InstallmentsInterestFreeConfig = {
  * Online checkout configuration for redirect-based flows.
  */
 export declare type OnlineConfig = {
-	/** URL notified via webhook when the payment status changes. */
+	/** URL the buyer is redirected to after external payment authorization (e.g. 3DS or PSE). Webhook notifications use the URL configured in the Developer Dashboard. */
 	callback_url?: string;
 	/** URL the buyer is redirected to after a successful payment. */
 	success_url?: string;

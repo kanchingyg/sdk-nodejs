@@ -10,11 +10,19 @@
  */
 
 /** Shape of the raw error body returned by the MercadoPago API. */
+export interface OrderApiErrorItem {
+	code?: string;
+	message?: string;
+	details?: string[];
+	[key: string]: unknown;
+}
+
 interface ApiErrorBody {
     status?: number;
     message?: string;
     error?: string;
     cause?: unknown[];
+    errors?: OrderApiErrorItem[];
     [key: string]: unknown;
 }
 
@@ -22,20 +30,30 @@ interface ApiErrorBody {
  * Base class for all MercadoPago API errors.
  *
  * Preserves backward-compatible properties (`status`, `message`, `error`, `causes`)
- * that existing catch blocks may already reference.
+ * and also normalises Orders API `errors` arrays (`{ errors: [{ code, message, details }] }`).
  */
 export class MercadoPagoError extends Error {
 	readonly status: number;
 	readonly error: string;
 	readonly causes: unknown[];
+	readonly errors: OrderApiErrorItem[];
 
 	constructor(body: ApiErrorBody) {
-		const msg = body.message || body.error || 'MercadoPago API error';
+		const orderErrors = Array.isArray(body.errors) ? body.errors : [];
+		const firstOrderErr = orderErrors[0];
+		const firstDetail = Array.isArray(firstOrderErr?.details) && firstOrderErr.details.length > 0
+			? `: ${firstOrderErr.details.join('; ')}`
+			: '';
+		const orderMsg = firstOrderErr?.message
+			? `${firstOrderErr.message}${firstDetail}`
+			: undefined;
+		const msg = body.message || orderMsg || body.error || firstOrderErr?.code || 'MercadoPago API error';
 		super(msg);
 		this.name = this.constructor.name;
 		this.status = body.status ?? 0;
-		this.error = body.error ?? '';
-		this.causes = body.cause ?? [];
+		this.error = body.error ?? firstOrderErr?.code ?? '';
+		this.causes = body.cause ?? orderErrors;
+		this.errors = orderErrors;
 		// Maintain prototype chain in compiled JavaScript
 		Object.setPrototypeOf(this, new.target.prototype);
 	}

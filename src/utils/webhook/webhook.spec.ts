@@ -220,6 +220,19 @@ describe('WebhookSignatureValidator', () => {
 			})).not.toThrow();
 		});
 
+		it('orders API 13-digit millisecond ts is accepted when within toleranceSeconds', () => {
+			// Orders API notifications send 13-digit millisecond ts (e.g. TS = '1742505638683').
+			const slightlyAfterMs = () => TS_NUM + 15 * 1000;
+			expect(() => WebhookSignatureValidator.validate({
+				xSignature: validHeader,
+				xRequestId: REQUEST_ID,
+				dataId: DATA_ID_LOWER,
+				secret: SECRET,
+				toleranceSeconds: 60,
+				now: slightlyAfterMs,
+			})).not.toThrow();
+		});
+
 		it('issue #459 — multibyte v1 hash throws InvalidWebhookSignatureError, not RangeError', () => {
 			// 'é' is 2 bytes but 1 character. Before the fix, Buffer.from() would
 			// produce a 65-byte buffer for the 64-char string, causing timingSafeEqual

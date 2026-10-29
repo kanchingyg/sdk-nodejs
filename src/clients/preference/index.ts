@@ -43,8 +43,7 @@ export class Preference {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preference/get.ts Usage Example }.
 	 */
 	get({ preferenceId, requestOptions }: PreferenceGetData): Promise<PreferenceResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return get({ id: preferenceId, config: this.config });
+		return get({ id: preferenceId, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -53,8 +52,7 @@ export class Preference {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preference/create.ts Usage Example }.
 	 */
 	create({ body, requestOptions }: PreferenceCreateData): Promise<PreferenceResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return create({ body, config: this.config });
+		return create({ body, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -63,8 +61,7 @@ export class Preference {
 	 * @see {@link https://github.com/mercadopago/sdk-nodejs/blob/master/src/examples/preference/update.ts Usage Example }.
 	 */
 	update({ id, updatePreferenceRequest, requestOptions }: PreferenceUpdateData): Promise<PreferenceResponse> {
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return update({ id, updatePreferenceRequest, config: this.config });
+		return update({ id, updatePreferenceRequest, config: this.config.withOptions(requestOptions) });
 	}
 
 	/**
@@ -74,8 +71,7 @@ export class Preference {
 	 */
 	search(preferenceSearchData: PreferenceSearchData = {}): Promise<PreferenceSearchResponse> {
 		const { options, requestOptions } = preferenceSearchData;
-		this.config.options = { ...this.config.options, ...requestOptions };
-		return search({ options, config: this.config });
+		return search({ options, config: this.config.withOptions(requestOptions) });
 	}
 
 }

@@ -95,6 +95,37 @@ describe('buildError factory', () => {
 		expect(err).toBeInstanceOf(Cls as unknown as new (...args: unknown[]) => unknown);
 	});
 
+	it('populates message, error, causes, and errors from Orders API error body', () => {
+		const err = buildError(422, {
+			errors: [
+				{
+					code: 'invalid_parameter',
+					message: 'Invalid payer email',
+					details: ['payer.email must be a valid email address'],
+				},
+			],
+		});
+		expect(err).toBeInstanceOf(MPValidationError);
+		expect(err.message).toBe('Invalid payer email: payer.email must be a valid email address');
+		expect(err.error).toBe('invalid_parameter');
+		expect(err.causes).toHaveLength(1);
+		expect(err.errors[0].code).toBe('invalid_parameter');
+	});
+
+	it('MercadoPagoConfig.withOptions merges requestOptions without mutating shared config', () => {
+		const { MercadoPagoConfig } = require('@src/mercadoPagoConfig');
+		const sharedConfig = new MercadoPagoConfig({
+			accessToken: 'APP_USR-test',
+			options: { timeout: 5000, integratorId: 'int-1' },
+		});
+		const scoped = sharedConfig.withOptions({ idempotencyKey: 'idem-req-1', timeout: 2000 });
+		expect(scoped.options?.idempotencyKey).toBe('idem-req-1');
+		expect(scoped.options?.timeout).toBe(2000);
+		expect(scoped.options?.integratorId).toBe('int-1');
+		expect(sharedConfig.options?.idempotencyKey).toBeUndefined();
+		expect(sharedConfig.options?.timeout).toBe(5000);
+	});
+
 	it('429 with retryAfter creates MPRateLimitError with seconds', () => {
 		const err = buildError(429, {}, 30);
 		expect(err).toBeInstanceOf(MPRateLimitError);

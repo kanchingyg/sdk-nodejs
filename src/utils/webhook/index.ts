@@ -191,7 +191,9 @@ export class WebhookSignatureValidator {
 		}
 
 		if (toleranceSeconds !== undefined) {
-			const tsMs = Number(ts) * 1000;  // ts is in seconds, convert to ms
+			const tsNum = Number(ts);
+			// Payments API sends 10-digit seconds; Orders API sends 13-digit milliseconds.
+			const tsMs = tsNum < 1e11 ? tsNum * 1000 : tsNum;
 			const driftSeconds = Math.abs(now() - tsMs) / 1000;
 			if (driftSeconds > toleranceSeconds) {
 				throw new InvalidWebhookSignatureError(SignatureFailureReason.TimestampOutOfTolerance, xRequestId, ts);
@@ -252,7 +254,9 @@ function buildManifest(dataId: string | undefined, requestId: string | undefined
  * Constant-time hex-string comparison. Returns `false` (without divulging
  * lengths via timing) when the strings differ in length.
  */
+const HEX_64_RE = /^[0-9a-fA-F]{64}$/;
+
 function constantTimeEquals(a: string, b: string): boolean {
-	if (Buffer.byteLength(a) !== Buffer.byteLength(b)) return false;
-	return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+	if (!HEX_64_RE.test(a) || !HEX_64_RE.test(b)) return false;
+	return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
 }
